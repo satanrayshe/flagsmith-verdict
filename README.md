@@ -293,7 +293,7 @@ They fit together: set an experiment up with the prompt, then let Verdict watch 
 
 Everything in the demo is labelled, and nothing here was measured on real users.
 
-- **SAMPLE app.** [`examples/pricing-page`](examples/pricing-page) is a static page that runs the `cta_copy` experiment with `@flagsmith/flagsmith`. Copy `config.example.js` to `config.js`, put in your client-side environment key, and serve the folder with any static server. [`test/fixtures/broken-app`](test/fixtures/broken-app) is the same idea with four mistakes planted on purpose, and `test/fixtures/fixed-app` has them corrected.
+- **SAMPLE app.** [`examples/pricing-page`](examples/pricing-page) is a static page that runs the `cta_copy` experiment with `@flagsmith/flagsmith`. Copy `config.example.js` to `config.js`, put in your client-side environment key, and serve the folder with any static server. [`test/fixtures/broken-app`](test/fixtures/broken-app) is the same idea with four mistakes planted on purpose, and `test/fixtures/fixed-app` has them corrected. The `demo/broken` branch plants the same four mistakes in the sample page itself, so a pull request from it fails the preflight job in CI.
 - **SIMULATED traffic.** [`examples/simulate.mjs`](examples/simulate.mjs) sends synthetic identities through `@flagsmith/nodejs` with a seeded random generator. Conversion chances are fixed in the script:
   - `cta_copy`: control 0.08, `start_free` 0.12. After the first 600 identities the result was INCONCLUSIVE (the draw went against the configured rates), so the experiment kept running to 6,000, where Flagsmith reported the numbers shown above.
   - `hero_layout`: 40 identities, too few to act on.
