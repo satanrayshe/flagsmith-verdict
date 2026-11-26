@@ -1,0 +1,8 @@
+{
+  "name": "sample-pricing-page-broken",
+  "private": true,
+  "description": "SAMPLE app with four mistakes planted on purpose for the Verdict demo and tests.",
+  "dependencies": {
+    "@flagsmith/flagsmith": "^12.5.0"
+  }
+}

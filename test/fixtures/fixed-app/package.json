@@ -1,0 +1,8 @@
+{
+  "name": "sample-pricing-page-fixed",
+  "private": true,
+  "description": "SAMPLE app: the broken fixture with every mistake corrected.",
+  "dependencies": {
+    "@flagsmith/flagsmith": "^12.5.0"
+  }
+}

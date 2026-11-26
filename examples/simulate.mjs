@@ -14,7 +14,7 @@ import { Flagsmith } from '@flagsmith/nodejs';
 
 const PRESETS = {
   // Reaches a clear winner: start_free converts more often than control.
-  cta_copy: { flag: 'cta_copy', prefix: 'sim-cta', count: 600, rates: { control: 0.08, start_free: 0.12 } },
+  cta_copy: { flag: 'cta_copy', prefix: 'sim-cta', count: 6000, rates: { control: 0.08, start_free: 0.12 } },
   // Too few identities to act on.
   hero_layout: { flag: 'hero_layout', prefix: 'sim-hero', count: 40, rates: { control: 0.08, split_hero: 0.1 } },
   // Sample ratio mismatch: about 40% of annual_first exposures are never
