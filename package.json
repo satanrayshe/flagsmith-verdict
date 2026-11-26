@@ -1,0 +1,34 @@
+{
+  "name": "flagsmith-verdict",
+  "version": "0.1.0",
+  "description": "Checks your code against your live Flagsmith experiments, gives one decision when results arrive, and ships the winner only after a human approves.",
+  "license": "MIT",
+  "type": "module",
+  "bin": { "verdict": "dist/cli.js" },
+  "files": ["dist", "action.yml", "README.md", "LICENSE"],
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepare": "tsc -p tsconfig.json",
+    "test": "vitest run --no-file-parallelism",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "keywords": ["flagsmith", "feature-flags", "experimentation", "ab-testing", "mcp", "cli"],
+  "dependencies": {
+    "@babel/parser": "^7.26.0",
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "commander": "^12.1.0",
+    "fast-glob": "^3.3.2",
+    "picocolors": "^1.1.1",
+    "semver": "^7.6.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@babel/types": "^7.26.0",
+    "@flagsmith/nodejs": "^9.4.0",
+    "@types/node": "^22.9.0",
+    "@types/semver": "^7.5.8",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.5"
+  }
+}

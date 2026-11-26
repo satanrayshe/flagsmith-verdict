@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.verdict/
+.env*
+flagsmith.json
+examples/pricing-page/config.js
+secrets/
+*.log
+coverage/
