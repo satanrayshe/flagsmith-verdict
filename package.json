@@ -4,16 +4,32 @@
   "description": "Checks your code against your live Flagsmith experiments, gives one decision when results arrive, and ships the winner only after a human approves.",
   "license": "MIT",
   "type": "module",
-  "bin": { "verdict": "dist/cli.js" },
-  "files": ["dist", "action.yml", "README.md", "LICENSE"],
-  "engines": { "node": ">=20" },
+  "bin": {
+    "verdict": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "action.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "prepare": "tsc -p tsconfig.json",
-    "test": "vitest run --no-file-parallelism",
+    "test": "tsc -p tsconfig.json && vitest run --no-file-parallelism",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
-  "keywords": ["flagsmith", "feature-flags", "experimentation", "ab-testing", "mcp", "cli"],
+  "keywords": [
+    "flagsmith",
+    "feature-flags",
+    "experimentation",
+    "ab-testing",
+    "mcp",
+    "cli"
+  ],
   "dependencies": {
     "@babel/parser": "^7.26.0",
     "@modelcontextprotocol/sdk": "^1.32.2",

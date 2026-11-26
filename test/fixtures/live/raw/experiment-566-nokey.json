@@ -1,0 +1,59 @@
+{
+  "id": 566,
+  "feature": {
+    "id": 305125,
+    "name": "verdict_scratch_nokey",
+    "type": "MULTIVARIATE",
+    "initial_value": "control",
+    "multivariate_options": [
+      {
+        "id": 37069,
+        "uuid": "51297b58-3f2e-4054-a3d0-769038a96dc7",
+        "type": "unicode",
+        "integer_value": null,
+        "string_value": "no_key_variant",
+        "boolean_value": null,
+        "default_percentage_allocation": 0,
+        "key": null
+      }
+    ]
+  },
+  "name": "Scratch nokey",
+  "hypothesis": "Scratch: variation without a key",
+  "status": "paused",
+  "metrics": [
+    {
+      "id": 618,
+      "metric": 561,
+      "metric_name": "Sign-ups",
+      "aggregation": "occurrence",
+      "direction": "up",
+      "expected_direction": "increase",
+      "created_at": "2026-11-26T08:05:38.734019Z"
+    }
+  ],
+  "experiment_rollout": {
+    "enabled": true,
+    "rollout_percentage": 100,
+    "feature_state_value": {
+      "type": "string",
+      "value": "control"
+    },
+    "multivariate_feature_state_values": [
+      {
+        "multivariate_feature_option": 37069,
+        "percentage_allocation": 50
+      }
+    ],
+    "audience": {
+      "match": "any",
+      "segments": []
+    }
+  },
+  "created_at": "2026-11-26T08:05:38.731357Z",
+  "updated_at": "2026-11-26T08:06:54.016668Z",
+  "started_at": "2026-11-26T08:05:49.909274Z",
+  "ended_at": null,
+  "rollout_decision": null,
+  "rollout_variant": null
+}

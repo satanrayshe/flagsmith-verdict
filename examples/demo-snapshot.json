@@ -1,0 +1,452 @@
+{
+  "capturedAt": "2026-11-26T08:27:26.600Z",
+  "source": "live",
+  "projectId": 54851,
+  "experiments": [
+    {
+      "id": 566,
+      "name": "Scratch nokey",
+      "hypothesis": "Scratch: variation without a key",
+      "status": "paused",
+      "flag": {
+        "id": 305125,
+        "name": "verdict_scratch_nokey",
+        "type": "MULTIVARIATE"
+      },
+      "variations": [
+        {
+          "id": null,
+          "key": "control",
+          "value": "control",
+          "isControl": true,
+          "allocation": 50
+        },
+        {
+          "id": 37069,
+          "key": null,
+          "value": "no_key_variant",
+          "isControl": false,
+          "allocation": 50
+        }
+      ],
+      "metrics": [
+        {
+          "metricId": 561,
+          "name": "Sign-ups",
+          "aggregation": "occurrence",
+          "direction": "up",
+          "expectedDirection": "increase",
+          "event": "signup"
+        }
+      ],
+      "rolloutPercentage": 100,
+      "startedAt": "2026-11-26T08:05:49.909274Z",
+      "endedAt": null,
+      "rolloutDecision": null,
+      "rolloutVariant": null
+    },
+    {
+      "id": 565,
+      "name": "Scratch ship",
+      "hypothesis": "Scratch experiment for testing the ship path",
+      "status": "completed",
+      "flag": {
+        "id": 305124,
+        "name": "verdict_scratch_ship",
+        "type": "MULTIVARIATE"
+      },
+      "variations": [
+        {
+          "id": null,
+          "key": "control",
+          "value": "control",
+          "isControl": true,
+          "allocation": 100
+        },
+        {
+          "id": 37067,
+          "key": "variant_b",
+          "value": "variant_b",
+          "isControl": false,
+          "allocation": 0
+        }
+      ],
+      "metrics": [
+        {
+          "metricId": 561,
+          "name": "Sign-ups",
+          "aggregation": "occurrence",
+          "direction": "up",
+          "expectedDirection": "increase",
+          "event": "signup"
+        }
+      ],
+      "rolloutPercentage": null,
+      "startedAt": "2026-11-26T08:06:33.084011Z",
+      "endedAt": "2026-11-26T08:06:39.524730Z",
+      "rolloutDecision": "variant",
+      "rolloutVariant": 37067
+    },
+    {
+      "id": 564,
+      "name": "Plan toggle",
+      "hypothesis": "Annual-first toggle lifts sign-ups (SIMULATED demo traffic)",
+      "status": "running",
+      "flag": {
+        "id": 305123,
+        "name": "plan_toggle",
+        "type": "MULTIVARIATE"
+      },
+      "variations": [
+        {
+          "id": null,
+          "key": "control",
+          "value": "control",
+          "isControl": true,
+          "allocation": 50
+        },
+        {
+          "id": 37066,
+          "key": "annual_first",
+          "value": "annual_first",
+          "isControl": false,
+          "allocation": 50
+        }
+      ],
+      "metrics": [
+        {
+          "metricId": 561,
+          "name": "Sign-ups",
+          "aggregation": "occurrence",
+          "direction": "up",
+          "expectedDirection": "increase",
+          "event": "signup"
+        }
+      ],
+      "rolloutPercentage": 100,
+      "startedAt": "2026-11-26T08:08:26.614176Z",
+      "endedAt": null,
+      "rolloutDecision": null,
+      "rolloutVariant": null
+    },
+    {
+      "id": 563,
+      "name": "Hero layout",
+      "hypothesis": "A split hero lifts sign-ups (SIMULATED demo traffic)",
+      "status": "running",
+      "flag": {
+        "id": 305122,
+        "name": "hero_layout",
+        "type": "MULTIVARIATE"
+      },
+      "variations": [
+        {
+          "id": null,
+          "key": "control",
+          "value": "control",
+          "isControl": true,
+          "allocation": 50
+        },
+        {
+          "id": 37065,
+          "key": "split_hero",
+          "value": "split_hero",
+          "isControl": false,
+          "allocation": 50
+        }
+      ],
+      "metrics": [
+        {
+          "metricId": 561,
+          "name": "Sign-ups",
+          "aggregation": "occurrence",
+          "direction": "up",
+          "expectedDirection": "increase",
+          "event": "signup"
+        }
+      ],
+      "rolloutPercentage": 100,
+      "startedAt": "2026-11-26T08:08:25.637104Z",
+      "endedAt": null,
+      "rolloutDecision": null,
+      "rolloutVariant": null
+    },
+    {
+      "id": 562,
+      "name": "CTA copy",
+      "hypothesis": "A no-card CTA lifts sign-ups (SIMULATED demo traffic)",
+      "status": "running",
+      "flag": {
+        "id": 305121,
+        "name": "cta_copy",
+        "type": "MULTIVARIATE"
+      },
+      "variations": [
+        {
+          "id": null,
+          "key": "control",
+          "value": "control",
+          "isControl": true,
+          "allocation": 50
+        },
+        {
+          "id": 37064,
+          "key": "start_free",
+          "value": "start_free",
+          "isControl": false,
+          "allocation": 50
+        }
+      ],
+      "metrics": [
+        {
+          "metricId": 561,
+          "name": "Sign-ups",
+          "aggregation": "occurrence",
+          "direction": "up",
+          "expectedDirection": "increase",
+          "event": "signup"
+        }
+      ],
+      "rolloutPercentage": 100,
+      "startedAt": "2026-11-26T08:05:46.520965Z",
+      "endedAt": null,
+      "rolloutDecision": null,
+      "rolloutVariant": null
+    }
+  ],
+  "flags": [
+    {
+      "id": 297126,
+      "name": "show_demo_button",
+      "type": "MULTIVARIATE",
+      "defaultValue": "control",
+      "variations": []
+    },
+    {
+      "id": 305121,
+      "name": "cta_copy",
+      "type": "MULTIVARIATE",
+      "defaultValue": "control",
+      "variations": [
+        {
+          "id": 37064,
+          "key": "start_free",
+          "value": "start_free"
+        }
+      ]
+    },
+    {
+      "id": 305122,
+      "name": "hero_layout",
+      "type": "MULTIVARIATE",
+      "defaultValue": "control",
+      "variations": [
+        {
+          "id": 37065,
+          "key": "split_hero",
+          "value": "split_hero"
+        }
+      ]
+    },
+    {
+      "id": 305123,
+      "name": "plan_toggle",
+      "type": "MULTIVARIATE",
+      "defaultValue": "control",
+      "variations": [
+        {
+          "id": 37066,
+          "key": "annual_first",
+          "value": "annual_first"
+        }
+      ]
+    },
+    {
+      "id": 305124,
+      "name": "verdict_scratch_ship",
+      "type": "MULTIVARIATE",
+      "defaultValue": "control",
+      "variations": [
+        {
+          "id": 37067,
+          "key": "variant_b",
+          "value": "variant_b"
+        }
+      ]
+    },
+    {
+      "id": 305125,
+      "name": "verdict_scratch_nokey",
+      "type": "MULTIVARIATE",
+      "defaultValue": "control",
+      "variations": [
+        {
+          "id": 37069,
+          "key": null,
+          "value": "no_key_variant"
+        }
+      ]
+    }
+  ],
+  "metrics": [
+    {
+      "id": 561,
+      "name": "Sign-ups",
+      "aggregation": "occurrence",
+      "direction": "up",
+      "event": "signup"
+    }
+  ],
+  "warehouse": {
+    "id": 9788,
+    "type": "flagsmith",
+    "status": "pending_connection",
+    "statusDetail": null,
+    "totalEvents": 6970,
+    "lastEventAt": "2026-11-26T08:23:48.527000+00:00"
+  },
+  "warehouseEvents": [
+    "$flag_exposure",
+    "signup"
+  ],
+  "exposures": {
+    "562": {
+      "asOf": "2026-11-26T08:26:53.237981Z",
+      "lastErrorAt": null,
+      "excludedIdentities": 0,
+      "perVariation": {
+        "control": 2989,
+        "start_free": 3011
+      }
+    },
+    "563": {
+      "asOf": "2026-11-26T08:21:12.116826Z",
+      "lastErrorAt": null,
+      "excludedIdentities": 0,
+      "perVariation": {
+        "control": 22,
+        "split_hero": 18
+      }
+    },
+    "564": {
+      "asOf": "2026-11-26T08:21:06.018938Z",
+      "lastErrorAt": null,
+      "excludedIdentities": 0,
+      "perVariation": {
+        "control": 204,
+        "annual_first": 111
+      }
+    },
+    "565": null,
+    "566": {
+      "asOf": "2026-11-26T08:20:57.943461Z",
+      "lastErrorAt": null,
+      "excludedIdentities": 0,
+      "perVariation": {}
+    }
+  },
+  "results": {
+    "562": {
+      "asOf": "2026-11-26T08:26:53.137534Z",
+      "lastErrorAt": null,
+      "isFinal": false,
+      "srmPValue": null,
+      "metrics": [
+        {
+          "metricId": 561,
+          "variants": {
+            "control": {
+              "n": 2989,
+              "sum": 254,
+              "sumSquares": 254
+            },
+            "start_free": {
+              "n": 3011,
+              "sum": 328,
+              "sumSquares": 328
+            }
+          },
+          "inference": {
+            "start_free": {
+              "lift": 0.28190336221256973,
+              "ciLow": 0.08214550905861448,
+              "ciHigh": 0.48166121536652495,
+              "chanceToWin": 0.9971621470282619
+            }
+          }
+        }
+      ]
+    },
+    "563": {
+      "asOf": "2026-11-26T08:21:11.961442Z",
+      "lastErrorAt": null,
+      "isFinal": false,
+      "srmPValue": null,
+      "metrics": [
+        {
+          "metricId": 561,
+          "variants": {
+            "control": {
+              "n": 22,
+              "sum": 3,
+              "sumSquares": 3
+            },
+            "split_hero": {
+              "n": 18,
+              "sum": 3,
+              "sumSquares": 3
+            }
+          },
+          "inference": {
+            "split_hero": null
+          }
+        }
+      ]
+    },
+    "564": {
+      "asOf": "2026-11-26T08:21:05.871621Z",
+      "lastErrorAt": null,
+      "isFinal": false,
+      "srmPValue": null,
+      "metrics": [
+        {
+          "metricId": 561,
+          "variants": {
+            "control": {
+              "n": 204,
+              "sum": 19,
+              "sumSquares": 19
+            },
+            "annual_first": {
+              "n": 111,
+              "sum": 8,
+              "sumSquares": 8
+            }
+          },
+          "inference": {
+            "annual_first": {
+              "lift": -0.22617354196301567,
+              "ciLow": -0.8422676466535886,
+              "ciHigh": 0.38992056272755726,
+              "chanceToWin": 0.2359103087628624
+            }
+          }
+        }
+      ]
+    },
+    "565": null,
+    "566": {
+      "asOf": "2026-11-26T08:20:56.824089Z",
+      "lastErrorAt": null,
+      "isFinal": false,
+      "srmPValue": null,
+      "metrics": [
+        {
+          "metricId": 561,
+          "variants": {},
+          "inference": {}
+        }
+      ]
+    }
+  }
+}

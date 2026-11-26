@@ -1,0 +1,7 @@
+{
+  "events": [
+    "$flag_exposure",
+    "signup"
+  ],
+  "is_truncated": false
+}

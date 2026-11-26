@@ -86,7 +86,7 @@ export async function executePlan(plan: ShipPlan, deps: ExecuteDeps): Promise<Ex
   const file = path.join(deps.cwd, '.verdict', `cleanup-${plan.experiment.flag}.md`);
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, cleanupMarkdown(plan));
-  steps.push({ n: s3.n, title: s3.title, ok: true, detail: `${plan.cleanup.length} branches listed` });
+  steps.push({ n: s3.n, title: s3.title, ok: true, detail: `${plan.cleanup.length} variation checks listed` });
   deps.log(`done   3. ${s3.title}: ${path.relative(deps.cwd, file)}`);
   return { ok: true, steps, cleanupFile: file };
 }

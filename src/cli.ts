@@ -124,7 +124,7 @@ program
     try {
       const state = await loadLiveState(makeClient(globals()), { withResults: true });
       fs.writeFileSync(o.out, JSON.stringify(state, null, 2) + '\n');
-      console.log(`Saved ${state.experiments.length} experiments, ${state.flags.length} flags and ${state.metrics.length} metrics to ${o.out}.`);
+      console.log(`Saved to ${o.out}: experiments ${state.experiments.length}, flags ${state.flags.length}, metrics ${state.metrics.length}.`);
     } catch (err) { fail(err); }
   });
 

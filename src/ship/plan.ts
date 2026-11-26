@@ -3,7 +3,11 @@ import { CONTROL, Experiment, labelOf } from '../model.js';
 import { Facts } from '../scan/facts.js';
 
 export interface PlanStep { n: number; title: string; action: string; detail: string }
-export interface CleanupItem { file: string; line: number; snippet: string; variation: string }
+export interface CleanupItem {
+  file: string; line: number; snippet: string; variation: string;
+  /** 'losing': the branch is dead after the rollout. 'winner': the comparison is now always true. */
+  kind: 'losing' | 'winner';
+}
 
 export interface ShipPlan {
   experiment: { id: number; name: string; flag: string };
@@ -46,11 +50,11 @@ export function buildPlan(experiment: Experiment, decision: Decision, facts: Fac
     ? { rollout_decision: 'control' }
     : { rollout_decision: 'variant', rollout_variant: variation.id! };
 
-  const losing = experiment.variations.filter((v) => v !== variation);
-  const losingLabels = new Set(losing.flatMap((v) => [labelOf(v), v.value]));
+  const winnerLabels = new Set([winner, variation.value]);
+  const known = new Set(experiment.variations.flatMap((v) => [labelOf(v), v.value]));
   const cleanup: CleanupItem[] = (facts?.compares ?? [])
-    .filter((c) => c.flag === experiment.flag.name && c.literal !== winner && losingLabels.has(c.literal))
-    .map((c) => ({ file: c.file, line: c.line, snippet: c.snippet, variation: c.literal }));
+    .filter((c) => c.flag === experiment.flag.name && known.has(c.literal))
+    .map((c) => ({ file: c.file, line: c.line, snippet: c.snippet, variation: c.literal, kind: winnerLabels.has(c.literal) ? 'winner' as const : 'losing' as const }));
 
   const flag = experiment.flag.name;
   const steps: PlanStep[] = [
@@ -70,7 +74,7 @@ export function buildPlan(experiment: Experiment, decision: Decision, facts: Fac
       n: 3, title: 'List code to clean up',
       action: `write .verdict/cleanup-${flag}.md`,
       detail: facts
-        ? cleanup.length ? `${cleanup.length} branch${cleanup.length === 1 ? '' : 'es'} for losing variations found in the code.` : 'No branches for losing variations were found in the scanned code.'
+        ? cleanup.length ? `${cleanup.length} variation check${cleanup.length === 1 ? '' : 's'} on this flag found in the code.` : 'No variation checks on this flag were found in the scanned code.'
         : 'No code path was scanned; pass a path to list the branches.',
     },
   ];
@@ -100,7 +104,7 @@ export function planText(plan: ShipPlan): string {
     out.push(`   ${s.action}`);
     out.push(`   ${s.detail}`);
   }
-  for (const c of plan.cleanup) out.push(`   - ${c.file}:${c.line}  ${c.snippet}`);
+  for (const c of plan.cleanup) out.push(`   - ${c.file}:${c.line}  ${c.snippet}  (${c.kind === 'winner' ? 'now always true' : 'dead after rollout'})`);
   out.push('');
   out.push(`Undo: ${plan.undo}`);
   return out.join('\n');
@@ -109,10 +113,13 @@ export function planText(plan: ShipPlan): string {
 export function cleanupMarkdown(plan: ShipPlan): string {
   const out = [`# Cleanup after "${plan.experiment.name}"`, '', `Flag \`${plan.experiment.flag}\` now serves \`${plan.winner}\` to everyone.`, '',
     'Flagsmith: "Once it\'s permanent, clean up the flag and remove the losing variations."', ''];
-  if (plan.cleanup.length === 0) out.push('No branches for losing variations were found in the scanned code.');
+  if (plan.cleanup.length === 0) out.push('No variation checks on this flag were found in the scanned code.');
   else {
-    out.push('Branches for losing variations:', '');
-    for (const c of plan.cleanup) out.push(`- [ ] \`${c.file}:${c.line}\` (${c.variation}) \`${c.snippet}\``);
+    out.push('Variation checks on this flag:', '');
+    for (const c of plan.cleanup) {
+      const what = c.kind === 'winner' ? 'now always true; keep the body, drop the check' : 'dead after the rollout; remove the branch';
+      out.push(`- [ ] \`${c.file}:${c.line}\` \`${c.snippet}\` (${c.variation}: ${what})`);
+    }
   }
   return out.join('\n') + '\n';
 }

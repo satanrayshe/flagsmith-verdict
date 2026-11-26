@@ -1,0 +1,14 @@
+[
+  {
+    "id": 9788,
+    "warehouse_type": "flagsmith",
+    "status": "pending_connection",
+    "status_detail": null,
+    "name": "Flagsmith",
+    "config": null,
+    "created_at": "2026-11-19T09:54:13.276959Z",
+    "total_events_received": 6970,
+    "unique_events_count": 2,
+    "last_event_received_at": "2026-11-26T08:23:48.527000+00:00"
+  }
+]

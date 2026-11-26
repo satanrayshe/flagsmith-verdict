@@ -1,0 +1,18 @@
+{
+  "count": 1,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 37069,
+      "uuid": "51297b58-3f2e-4054-a3d0-769038a96dc7",
+      "type": "unicode",
+      "integer_value": null,
+      "string_value": "no_key_variant",
+      "boolean_value": null,
+      "default_percentage_allocation": 0,
+      "key": null,
+      "feature": 305125
+    }
+  ]
+}

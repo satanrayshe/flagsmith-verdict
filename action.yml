@@ -1,0 +1,54 @@
+name: Verdict preflight
+description: Checks a JS/TS codebase against your live Flagsmith experiments and fails the job on mistakes that make an experiment collect no data.
+branding:
+  icon: check-circle
+  color: gray-dark
+inputs:
+  path:
+    description: Directory to scan.
+    default: '.'
+  offline:
+    description: Run only the code rules, with no Flagsmith credentials.
+    default: 'false'
+  snapshot:
+    description: Path to a file written by "verdict snapshot". Used instead of calling Flagsmith.
+    default: ''
+  fail-on:
+    description: Lowest level that fails the job (error or warning).
+    default: error
+  environment:
+    description: Client-side environment key. Not needed with offline or snapshot.
+    default: ''
+  api-key:
+    description: Flagsmith API key, from a repository secret. Not needed with offline or snapshot, or when the Flagsmith CLI is already logged in.
+    default: ''
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - name: Build Verdict
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: npm ci --ignore-scripts --no-audit --no-fund && npm run build
+    - name: Preflight
+      shell: bash
+      env:
+        FLAGSMITH_API_KEY: ${{ inputs.api-key }}
+        FLAGSMITH_ENVIRONMENT: ${{ inputs.environment }}
+        VERDICT_PATH: ${{ inputs.path }}
+        VERDICT_OFFLINE: ${{ inputs.offline }}
+        VERDICT_SNAPSHOT: ${{ inputs.snapshot }}
+        VERDICT_FAIL_ON: ${{ inputs.fail-on }}
+      run: |
+        args=(preflight "$VERDICT_PATH" --format markdown --fail-on "$VERDICT_FAIL_ON")
+        if [ "$VERDICT_OFFLINE" = "true" ]; then args+=(--offline); fi
+        if [ -n "$VERDICT_SNAPSHOT" ]; then args+=(--snapshot "$VERDICT_SNAPSHOT"); fi
+        set +e
+        node "$GITHUB_ACTION_PATH/dist/cli.js" "${args[@]}" > "$RUNNER_TEMP/verdict.md"
+        code=$?
+        set -e
+        cat "$RUNNER_TEMP/verdict.md"
+        cat "$RUNNER_TEMP/verdict.md" >> "$GITHUB_STEP_SUMMARY"
+        exit $code

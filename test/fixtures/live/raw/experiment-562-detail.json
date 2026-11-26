@@ -1,0 +1,59 @@
+{
+  "id": 562,
+  "feature": {
+    "id": 305121,
+    "name": "cta_copy",
+    "type": "MULTIVARIATE",
+    "initial_value": "control",
+    "multivariate_options": [
+      {
+        "id": 37064,
+        "uuid": "b1e4f96f-6e60-45fa-af14-321a027eddd4",
+        "type": "unicode",
+        "integer_value": null,
+        "string_value": "start_free",
+        "boolean_value": null,
+        "default_percentage_allocation": 0,
+        "key": "start_free"
+      }
+    ]
+  },
+  "name": "CTA copy",
+  "hypothesis": "A no-card CTA lifts sign-ups (SIMULATED demo traffic)",
+  "status": "running",
+  "metrics": [
+    {
+      "id": 614,
+      "metric": 561,
+      "metric_name": "Sign-ups",
+      "aggregation": "occurrence",
+      "direction": "up",
+      "expected_direction": "increase",
+      "created_at": "2026-11-26T08:05:32.207491Z"
+    }
+  ],
+  "experiment_rollout": {
+    "enabled": true,
+    "rollout_percentage": 100,
+    "feature_state_value": {
+      "type": "string",
+      "value": "control"
+    },
+    "multivariate_feature_state_values": [
+      {
+        "multivariate_feature_option": 37064,
+        "percentage_allocation": 50
+      }
+    ],
+    "audience": {
+      "match": "any",
+      "segments": []
+    }
+  },
+  "created_at": "2026-11-26T08:05:32.203644Z",
+  "updated_at": "2026-11-26T08:05:46.524117Z",
+  "started_at": "2026-11-26T08:05:46.520965Z",
+  "ended_at": null,
+  "rollout_decision": null,
+  "rollout_variant": null
+}

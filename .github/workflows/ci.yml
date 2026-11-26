@@ -1,0 +1,25 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm test
+  preflight:
+    # Runs Verdict on the SAMPLE pricing page against the saved snapshot of the
+    # demo environment, so pull requests are checked without any credentials.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          path: examples/pricing-page
+          snapshot: examples/demo-snapshot.json
