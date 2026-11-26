@@ -125,13 +125,15 @@ describe('ship', () => {
     expect(out).toMatchObject({ exitCode: 1, outcome: 'failed' });
     expect(evaluated).toBe(0);
     expect(audit()[0].steps).toHaveLength(1);
-    expect(lines.join('\n')).not.toContain('Undo:');
+    // The plan shows the undo command once; it is not repeated when nothing was changed.
+    expect(lines.join('\n').match(/Undo:/g)).toHaveLength(1);
   });
   it('failed verification: exit 1, undo printed, no cleanup file', async () => {
     const out = await ship(experiment(), shipDecision(), null, {}, deps({ evaluate: async (_f, identity) => ({ identity, variant: 'control', value: 'control' }) }));
     expect(out.exitCode).toBe(1);
     expect(audit()[0].steps.map((s: any) => s.ok)).toEqual([true, false]);
-    expect(lines.join('\n')).toContain('Undo: flagsmith flag update cta_copy');
+    // Once in the plan, and again after the failure because step 1 did change the flag.
+    expect(lines.join('\n').match(/Undo: flagsmith flag update cta_copy/g)).toHaveLength(2);
     expect(fs.existsSync(path.join(cwd, '.verdict', 'cleanup-cta_copy.md'))).toBe(false);
   });
   it('override reason is written to the audit log', async () => {

@@ -32,7 +32,13 @@ function writeCache(cwd: string, cache: Cache): void {
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const rolloutFingerprint = (e: Experiment) => `${e.rolloutPercentage}|${e.variations.map((v) => `${v.key ?? v.value}:${v.allocation}`).join(',')}`;
 
-export interface StatusOptions { refresh?: boolean; cwd?: string; waitMs?: number }
+export interface StatusOptions {
+  refresh?: boolean;
+  cwd?: string;
+  /** How long to wait for Flagsmith to finish a requested refresh. */
+  waitMs?: number;
+  pollMs?: number;
+}
 
 /** Reads one experiment from Flagsmith, refreshes stale results when allowed, and decides. */
 export async function statusLive(client: FlagsmithClient, experiment: Experiment, warehouse: Warehouse | null, opts: StatusOptions = {}): Promise<StatusReport> {
@@ -55,12 +61,12 @@ export async function statusLive(client: FlagsmithClient, experiment: Experiment
     else if (Date.now() - lastAsked < STALE_MS) refresh = 'skipped (a refresh was requested less than 5 minutes ago)';
     else {
       const [r] = await Promise.all([client.refreshResults(experiment.id), client.refreshExposures(experiment.id)]);
-      entry.refreshedAt = new Date().toISOString();
       if (r.requested) {
+        entry.refreshedAt = new Date().toISOString();
         refresh = 'requested';
         const deadline = Date.now() + (opts.waitMs ?? 20000);
         while (Date.now() < deadline) {
-          await sleep(4000);
+          await sleep(opts.pollMs ?? 4000);
           const next = await client.getResults(experiment.id);
           if (next?.asOf && next.asOf !== results?.asOf) {
             results = next;
