@@ -2,7 +2,7 @@
 
 Verdict checks your code against your live Flagsmith experiments, gives one decision when results arrive, and ships the winner only after a person approves it.
 
-It is a Node CLI, a stdio MCP server and a GitHub Action. Built for the Toggle Wars hackathon, Track 02 (AI Agents and Feature Flags).
+It is a Node CLI, a stdio MCP server, a GitHub Action and an [Agent Skill](#agent-skill-track-04). Built for the Toggle Wars hackathon, Track 02 (AI Agents and Feature Flags) and Track 04 (Flagsmith Agent Skills).
 
 ```
 $ verdict preflight test/fixtures/broken-app
@@ -118,6 +118,13 @@ CTA copy  flag cta_copy, experiment 562, running
 
 Exit codes: 0 for SHIP, KEEP CONTROL or ENDED; 10 for NOT STARTED, NO DATA YET, KEEP RUNNING or INCONCLUSIVE; 20 for BLOCKED, DO NOT ACT or DO NOT SHIP; 2 for errors. A scheduled job can branch on them.
 
+`--format brief` prints one line per experiment with the decision first, for scripts and agents:
+
+```
+$ verdict status "CTA copy" --format brief --snapshot examples/demo-snapshot.json
+SHIP start_free | CTA copy | experiment 562 | flag cta_copy | start_free beats control on "Sign-ups": lift +28.2%, 95% interval +8.2% to +48.2%, chance to beat control 99.7%. | results as of 2026-11-26T08:26:53.137534Z
+```
+
 ### `verdict ship <experiment>`
 
 Builds a change plan, shows it, and asks a person to type the experiment name. Only an exact match goes ahead.
@@ -192,6 +199,54 @@ jobs:
 ```
 
 The report is written to the job summary as a table and the job fails on any error. With `snapshot: path/to/verdict-snapshot.json` (or `offline: 'true'`) it needs no secret at all. This repository's own [CI workflow](.github/workflows/ci.yml) runs the action on the sample pricing page against the saved demo snapshot.
+
+## Agent Skill (Track 04)
+
+[`skills/flagsmith-ship-winner`](skills/flagsmith-ship-winner) is an [Agent Skill](https://agentskills.io/specification) that takes an agent through one whole job with the Flagsmith CLI: from "is this experiment ready?" to "winner shipped and verified".
+
+| Step | Command | Output |
+|---|---|---|
+| 1. Find the experiment | `flagsmith api "api/v1/environments/$FLAGSMITH_ENVIRONMENT/experiments/" --jq <filter>` | one line per experiment: id, status, name, flag |
+| 2. Get the decision | `verdict status "<name>" --format brief` | one line and an exit code; anything but SHIP or KEEP CONTROL stops here |
+| 3. Show the plan | `verdict ship "<name>" --dry-run` | the API call, the verification, code to clean up, the undo command |
+| 4. Hand over | none | the agent asks a person to run `verdict ship "<name>"` and waits |
+| 5. Verify and record | `node scripts/verify.mjs "<name>"` | one line from `flagsmith eval` on five fresh identities, and one line appended to `.verdict/audit.jsonl` |
+| 6. Report | none | four lines, with the rollback command |
+| 7. Remove the dead flag code, if asked | `git grep`, `verdict preflight`, `gh pr create` | a pull request that passes preflight |
+
+`SKILL.md` is 90 lines. The decision table, the rollback steps, the clean-up pull request and a path that needs only the Flagsmith CLI (no Verdict) sit in four `references/` files that the agent opens only when it needs them.
+
+**Install.** Copy the folder into the skills directory your agent reads, for example:
+
+```
+git clone https://github.com/satanrayshe/flagsmith-verdict
+cp -r flagsmith-verdict/skills/flagsmith-ship-winner <your agent's skills folder>/
+```
+
+It needs the Flagsmith CLI v2 logged in (`flagsmith login`, `flagsmith init`), Node 20 or later, and `verdict` on PATH or through `npx -y github:satanrayshe/flagsmith-verdict`.
+
+**Safety rules.**
+
+- The agent only reads. Every command block in `SKILL.md` is read-only, and a test checks that.
+- The one production write is `verdict ship`, and a person runs it and types the experiment name. If the agent runs it, it exits 3 with nothing changed, because no terminal is attached.
+- The skill forbids the ways around that: `flagsmith api -X POST`, `flagsmith flag update`, `--yes`, `--override`, piping input.
+- The agent says before the hand-off that an ended experiment cannot be restarted.
+- A decision that is not SHIP or KEEP CONTROL ends the run with the reason. The agent does not look for a way past it.
+- `scripts/verify.mjs` never writes to Flagsmith, evaluates identities without storing them, and never prints the environment key.
+- Rollback is documented, and it is also a person's command: `flagsmith flag update <flag> --weight <variation>=0`.
+
+**Demo run and token count.** Recorded on 27 Nov 2026 on a scratch experiment in the demo environment with SIMULATED traffic (400 identities). The whole job took four commands. The full record is in [`examples/skill-run.md`](examples/skill-run.md).
+
+| Part | Characters | Tokens (about) |
+|---|---|---|
+| `SKILL.md`, loaded once | 4,118 | 1,030 |
+| The four commands the agent wrote | 403 | 101 |
+| All output the agent read | 1,603 | 401 |
+| **Total** | **6,124** | **1,531** |
+
+Tokens are characters divided by 4, rounded up. No tokenizer was used, so these are estimates. For scale, the experiment list without `--jq` is 4,202 characters of JSON on its own.
+
+Two things about that run. The approval prompt was answered by a test harness that called the same `ship()` function as the command, so no person typed the name. And before it did, the agent's own attempt at `verdict ship` was refused with exit 3. Afterwards the rollback command was run on the scratch flag, three fresh identities came back as `control`, and the scratch flag and experiment were deleted.
 
 ## Install and authenticate
 
@@ -271,6 +326,7 @@ Flagsmith's own audit logs and change requests are part of its paid plans. Verdi
 | Feature | Where |
 |---|---|
 | Flagsmith CLI v2: `flagsmith api` as transport, `flagsmith eval` for verification, `flagsmith flag update` as the undo, `flagsmith auth status` | `src/flagsmith/cli-transport.ts`, `src/ship/execute.ts` |
+| Flagsmith CLI v2 from an agent: `flagsmith config --jq`, `flagsmith api --jq` to list experiments in one line each, `flagsmith eval --jq`, `flagsmith flag get --jq` | `skills/flagsmith-ship-winner` |
 | Experiments API: list, detail, exposures, results, both refresh endpoints, complete with a rollout decision | `src/flagsmith/client.ts` |
 | Metrics API (event definitions) | VD005 |
 | Warehouse connection and its received event names | VD008, preflight notes, decision row 3 |
@@ -307,7 +363,7 @@ verdict status --snapshot examples/demo-snapshot.json
 verdict ship "CTA copy" --dry-run --snapshot examples/demo-snapshot.json
 ```
 
-To reproduce against your own environment, follow Flagsmith's [set-up guide](https://docs.flagsmith.com/experimentation/set-up-with-a-coding-agent) to create a multivariate flag `cta_copy` with a keyed variation `start_free`, a metric on the event `signup` and an experiment, then run `FLAGSMITH_SERVER_KEY=... node examples/simulate.mjs cta_copy`.
+To reproduce against your own environment, follow Flagsmith's [set-up guide](https://docs.flagsmith.com/experimentation/set-up-with-a-coding-agent) to create a multivariate flag `cta_copy` with a keyed variation `start_free`, a metric on the event `signup` and an experiment, then run `FLAGSMITH_SERVER_KEY=... node examples/simulate.mjs cta_copy`. For a flag with other names, `node examples/simulate.mjs custom --flag <flag> --rates control=0.1,<variation>=0.4` sends the same kind of traffic.
 
 One real finding from building this: the demo environment holds a paused experiment, "Scratch nokey", on a flag whose variation was created through the API without a key. Flagsmith created and started that experiment without complaint. VD004 reports it.
 
@@ -328,7 +384,7 @@ npm ci
 npm test        # builds, then runs the tests
 ```
 
-The tests need no Flagsmith account and make no network calls. They cover every rule, every row of the decision table, the sample ratio maths against hand-computed values, the normaliser against recorded API responses, the approval and audit paths, the built CLI end to end, and the MCP server over stdio.
+The tests need no Flagsmith account and make no network calls. They cover every rule, every row of the decision table, the sample ratio maths against hand-computed values, the normaliser against recorded API responses, the approval and audit paths, the built CLI end to end, the MCP server over stdio, the skill's layout and frontmatter against the Agent Skills specification, and the skill's script against a stand-in for the Flagsmith CLI.
 
 ```
 src/
@@ -340,7 +396,8 @@ src/
   ship/               plan, typed approval, execution, audit log
   mcp/server.ts       stdio MCP server
   render/             text, JSON and markdown output
-examples/             SAMPLE pricing page, SIMULATED traffic script, demo snapshot
+examples/             SAMPLE pricing page, SIMULATED traffic script, demo snapshot, skill demo run
+skills/               the flagsmith-ship-winner Agent Skill: SKILL.md, scripts/, references/
 test/                 tests, fixture apps, recorded API responses
 ```
 
