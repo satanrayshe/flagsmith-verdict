@@ -34,6 +34,13 @@ describe('verdict CLI', () => {
     expect(run('status', 'Hero layout', '--snapshot', snapshot).status).toBe(10);
     expect(run('status', 'Plan toggle', '--snapshot', snapshot).status).toBe(20);
   });
+  it('status --format brief prints one line per experiment, decision first', () => {
+    const r = run('status', '--snapshot', snapshot, '--format', 'brief');
+    const lines = r.stdout.trim().split('\n');
+    expect(lines).toHaveLength(5);
+    expect(lines.find((l) => l.includes('| CTA copy |'))).toMatch(/^SHIP start_free \| CTA copy \| experiment 562 \| flag cta_copy \| .*chance to beat control 99\.7%\. \| results as of 2026-/);
+    expect(lines.find((l) => l.includes('| Plan toggle |'))).toMatch(/^DO NOT ACT/);
+  });
   it('status without credentials or snapshot exits 2 with a clear message', () => {
     const r = run('--transport', 'api-key', 'status');
     expect(r.status).toBe(2);

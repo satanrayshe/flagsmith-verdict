@@ -8,7 +8,7 @@ import { LiveState, loadLiveState, readSnapshot } from './live.js';
 import { runMcpServer } from './mcp/server.js';
 import { preflight, preflightExitCode } from './preflight.js';
 import { preflightJson, preflightMarkdown, preflightText } from './render/preflight.js';
-import { statusJson, statusListText, statusMarkdown } from './render/status.js';
+import { statusBrief, statusJson, statusListText, statusMarkdown } from './render/status.js';
 import { RULES } from './rules/index.js';
 import { scan } from './scan/extract.js';
 import { terminalIo } from './ship/approve.js';
@@ -62,7 +62,7 @@ program
   .description('one decision per experiment, with the reason; without an argument, every experiment in the environment')
   .option('--no-refresh', 'never ask Flagsmith to recompute results')
   .option('--snapshot <file>', 'decide from a saved snapshot instead of calling Flagsmith')
-  .addOption(format())
+  .addOption(new Option('--format <format>', 'output format; brief is one line per experiment').choices(['text', 'json', 'markdown', 'brief']).default('text'))
   .action(async (ref: string | undefined, o) => {
     try {
       const reports: StatusReport[] = [];
@@ -76,7 +76,7 @@ program
         const experiments = ref ? [await client.findExperiment(ref)] : await Promise.all((await client.listExperiments()).map((e) => client.getExperiment(e.id)));
         for (const e of experiments) reports.push(await statusLive(client, e, warehouse, { refresh: o.refresh }));
       }
-      console.log(o.format === 'json' ? statusJson(reports) : o.format === 'markdown' ? statusMarkdown(reports) : statusListText(reports));
+      console.log(o.format === 'json' ? statusJson(reports) : o.format === 'markdown' ? statusMarkdown(reports) : o.format === 'brief' ? statusBrief(reports) : statusListText(reports));
       process.exitCode = combinedExitCode(reports);
     } catch (err) { fail(err); }
   });

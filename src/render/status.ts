@@ -51,6 +51,18 @@ export function statusLine(r: StatusReport): string {
   return `${r.experiment.name} (${r.experiment.flag.name}): ${r.decision.headline}. ${r.decision.reason}`;
 }
 
+/**
+ * One line per experiment, decision first, for scripts and agents that pay per
+ * token: "SHIP start_free | CTA copy | experiment 562 | flag cta_copy | <reason> | results as of <time>".
+ */
+export function statusBrief(reports: StatusReport[]): string {
+  if (reports.length === 0) return 'No experiments in this environment.';
+  return reports.map((r) => [
+    r.decision.headline, r.experiment.name, `experiment ${r.experiment.id}`, `flag ${r.experiment.flag.name}`,
+    r.decision.reason, `results as of ${r.decision.asOf ?? 'n/a'}`,
+  ].join(' | ')).join('\n');
+}
+
 export function statusListText(reports: StatusReport[]): string {
   if (reports.length === 0) return 'No experiments in this environment.';
   return reports.map(statusText).join('\n\n');

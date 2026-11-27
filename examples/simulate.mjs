@@ -9,6 +9,8 @@
 // Usage:
 //   FLAGSMITH_SERVER_KEY=ser.xxx node examples/simulate.mjs <preset> [--count N] [--env-file path]
 // Presets: cta_copy | hero_layout | plan_toggle | warmup
+// Your own flag:
+//   node examples/simulate.mjs custom --flag my_flag --rates control=0.1,new_copy=0.4 [--prefix sim-my] [--count N]
 import fs from 'node:fs';
 import { Flagsmith } from '@flagsmith/nodejs';
 
@@ -28,11 +30,16 @@ const PRESETS = {
 };
 
 const args = process.argv.slice(2);
-const presetName = args.find((a) => !a.startsWith('--'));
+const presetName = args[0];
 const opt = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
-const preset = PRESETS[presetName];
+// "custom" builds a preset from --flag and --rates (variation=conversion chance, comma-separated).
+const customRates = Object.fromEntries((opt('--rates') ?? '').split(',').filter(Boolean).map((p) => { const [k, v] = p.split('='); return [k, Number(v)]; }));
+const preset = presetName === 'custom' && opt('--flag') && Object.values(customRates).every((v) => v >= 0 && v <= 1)
+  ? { flag: opt('--flag'), prefix: opt('--prefix') ?? `sim-${opt('--flag')}`, count: 200, rates: customRates }
+  : PRESETS[presetName];
 if (!preset) {
-  console.error(`Usage: node examples/simulate.mjs <${Object.keys(PRESETS).join('|')}> [--count N] [--start N] [--env-file path]`);
+  console.error(`Usage: node examples/simulate.mjs <${Object.keys(PRESETS).join('|')}> [--count N] [--start N] [--env-file path]
+       node examples/simulate.mjs custom --flag <flag> --rates <variation>=<chance>,... [--prefix P] [--count N]`);
   process.exit(2);
 }
 
