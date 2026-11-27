@@ -1,49 +1,39 @@
 // SAMPLE app for the Verdict demo: a pricing page that runs the "cta_copy"
-// experiment. It passes `verdict preflight`.
+// experiment. On this branch four mistakes are planted on purpose so that
+// `verdict preflight` (and the CI job) fails. The working version is on main.
 import flagsmith from 'https://cdn.jsdelivr.net/npm/@flagsmith/flagsmith@12.5.0/+esm';
 
-const ID_KEY = 'sample_anonymous_id';
 const button = document.getElementById('cta');
 const status = document.getElementById('status');
-
-// A persistent anonymous id, so the same visitor stays in the same variation.
-function anonymousId() {
-  let id = localStorage.getItem(ID_KEY);
-  if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem(ID_KEY, id);
-  }
-  return id;
-}
 
 async function main() {
   if (!window.FLAGSMITH_ENVIRONMENT_ID || window.FLAGSMITH_ENVIRONMENT_ID.startsWith('YOUR_')) {
     status.textContent = 'Copy config.example.js to config.js and set your client-side environment key.';
     return;
   }
+  // Planted mistake 1: enableEvents is missing, so no exposure or event is ever sent.
   await flagsmith.init({
     environmentID: window.FLAGSMITH_ENVIRONMENT_ID,
-    enableEvents: true,
   });
-  const id = anonymousId();
+  // Planted mistake 2: a new random identity on every page load.
+  const id = 'visitor-' + Math.random().toString(36).slice(2);
   await flagsmith.identify(id);
 
-  // Evaluates the flag and records the exposure in one call.
   const flag = flagsmith.getExperimentFlag('cta_copy');
-  if (flag.variant === 'start_free') {
+  // Planted mistake 3: the variation key is start_free, so this branch never runs.
+  if (flag.variant === 'start-free') {
     button.textContent = 'Start free, no card needed';
   } else {
     button.textContent = 'Start trial';
   }
   button.disabled = false;
-  status.textContent = `identity: ${id}\nvariation: ${flag.variant ?? 'control'}\nin experiment: ${flag.experiment?.inExperiment ?? false}`;
+  status.textContent = `identity: ${id}\nvariation: ${flag.variant ?? 'control'}`;
 
-  button.addEventListener('click', async () => {
-    flagsmith.trackEvent('signup');
-    await flagsmith.flushEvents();
-    status.textContent += '\nsent event: signup';
+  button.addEventListener('click', () => {
+    // Planted mistake 4: the metric listens for "signup". Event names are case-sensitive.
+    flagsmith.trackEvent('Signup');
+    status.textContent += '\nsent event: Signup';
   });
-  window.addEventListener('pagehide', () => flagsmith.flushEvents());
 }
 
 main().catch((err) => { status.textContent = `Could not load flags: ${err.message}`; });
