@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SAMPLE pricing page (Verdict demo)</title>
+  <style>
+    body { font: 16px/1.5 system-ui, sans-serif; margin: 0; background: #f6f5f1; color: #1c1b19; }
+    main { max-width: 34rem; margin: 12vh auto; padding: 2rem; background: #fff; border: 1px solid #d9d6cd; }
+    h1 { margin: 0 0 .25rem; font-size: 1.6rem; }
+    .price { font-size: 2.4rem; font-weight: 700; margin: 1rem 0; }
+    button { font: inherit; font-weight: 600; padding: .7rem 1.2rem; border: 0; background: #1c1b19; color: #fff; cursor: pointer; }
+    #status { margin-top: 1.5rem; font: 13px/1.5 ui-monospace, monospace; color: #5c5a54; white-space: pre-wrap; }
+    .tag { display: inline-block; font-size: .75rem; letter-spacing: .06em; border: 1px solid #1c1b19; padding: 0 .4rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <span class="tag">SAMPLE APP</span>
+    <h1>Team plan</h1>
+    <p>Everything a small team needs to ship behind flags.</p>
+    <div class="price">$29 <small>/ month</small></div>
+    <button id="cta" disabled>Loading</button>
+    <div id="status"></div>
+  </main>
+  <script src="config.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
