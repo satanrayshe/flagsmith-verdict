@@ -39,8 +39,11 @@ describe('preflight against the recorded demo environment', () => {
     expect(preflightExitCode(report, 'warning')).toBe(1);
   });
 
+  // Runs on a copy of examples/pricing-page kept under test/fixtures, so the
+  // demo/broken branch (which plants mistakes in the example itself) fails only
+  // the preflight job in CI. The example page is checked by that job.
   it('the sample pricing page passes', async () => {
-    const report = await preflight(path.join(here, '..', 'examples', 'pricing-page'), state);
+    const report = await preflight(fixture('pricing-page'), state);
     expect(report.counts.error).toBe(0);
   });
 
