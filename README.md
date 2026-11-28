@@ -4,6 +4,42 @@ Verdict checks your code against your live Flagsmith experiments, gives one deci
 
 It is a Node CLI, a stdio MCP server, a GitHub Action and an [Agent Skill](#agent-skill-track-04). Built for the Toggle Wars hackathon, Track 02 (AI Agents and Feature Flags) and Track 04 (Flagsmith Agent Skills).
 
+## Install and authenticate
+
+Needs Node 20 or later.
+
+```
+git clone https://github.com/satanrayshe/flagsmith-verdict
+cd flagsmith-verdict
+npm ci
+npm run build
+npm link        # puts `verdict` on your PATH
+```
+
+Verdict reaches Flagsmith in one of two ways, tried in this order:
+
+1. **The Flagsmith CLI (preferred).** If [Flagsmith CLI v2](https://docs.flagsmith.com/integrating-with-flagsmith/CLI) is installed and `flagsmith auth status` succeeds, every request goes through `flagsmith api`. The credential stays in the CLI's keychain and Verdict never reads it.
+2. **An API key.** Set `FLAGSMITH_API_KEY`, or point at a file with `--env-file <path>`.
+
+Force one with `--transport cli` or `--transport api-key`.
+
+The environment comes from `--environment <client-side key>`, then `FLAGSMITH_ENVIRONMENT`, then the `flagsmith.json` that `flagsmith init` writes.
+
+## Flagsmith features used
+
+| Feature | Where |
+|---|---|
+| Flagsmith CLI v2: `flagsmith api` as transport, `flagsmith eval` for verification, `flagsmith flag update` as the undo, `flagsmith auth status` | `src/flagsmith/cli-transport.ts`, `src/ship/execute.ts` |
+| Flagsmith CLI v2 from an agent: `flagsmith config --jq`, `flagsmith api --jq` to list experiments in one line each, `flagsmith eval --jq`, `flagsmith flag get --jq` | `skills/flagsmith-ship-winner` |
+| Experiments API: list, detail, exposures, results, both refresh endpoints, complete with a rollout decision | `src/flagsmith/client.ts` |
+| Metrics API (event definitions) | VD005 |
+| Warehouse connection and its received event names | VD008, preflight notes, decision row 3 |
+| Multivariate flags, variation keys and weights | VD003, VD004, VD009, ship |
+| SDK experiment calls: `getExperimentFlag`, `trackEvent`, `trackExposureEvent`, `flushEvents`, `close` | sample page and `examples/simulate.mjs` |
+| SDK API identity evaluation | verification fallback when the CLI is not installed |
+
+## Example: preflight on the broken sample app
+
 ```
 $ verdict preflight test/fixtures/broken-app
 verdict preflight
@@ -248,27 +284,6 @@ Tokens are characters divided by 4, rounded up. No tokenizer was used, so these 
 
 Two things about that run. The approval prompt was answered by a test harness that called the same `ship()` function as the command, so no person typed the name. And before it did, the agent's own attempt at `verdict ship` was refused with exit 3. Afterwards the rollback command was run on the scratch flag, three fresh identities came back as `control`, and the scratch flag and experiment were deleted.
 
-## Install and authenticate
-
-Needs Node 20 or later.
-
-```
-git clone https://github.com/satanrayshe/flagsmith-verdict
-cd flagsmith-verdict
-npm ci
-npm run build
-npm link        # puts `verdict` on your PATH
-```
-
-Verdict reaches Flagsmith in one of two ways, tried in this order:
-
-1. **The Flagsmith CLI (preferred).** If [Flagsmith CLI v2](https://docs.flagsmith.com/integrating-with-flagsmith/CLI) is installed and `flagsmith auth status` succeeds, every request goes through `flagsmith api`. The credential stays in the CLI's keychain and Verdict never reads it.
-2. **An API key.** Set `FLAGSMITH_API_KEY`, or point at a file with `--env-file <path>`.
-
-Force one with `--transport cli` or `--transport api-key`.
-
-The environment comes from `--environment <client-side key>`, then `FLAGSMITH_ENVIRONMENT`, then the `flagsmith.json` that `flagsmith init` writes.
-
 ## Rule reference
 
 Errors fail the run. Warnings are heuristics and do not, unless you pass `--fail-on warning`. Rules marked "yes" compare code with Flagsmith and are skipped by `--offline`.
@@ -320,19 +335,6 @@ Row 5 uses `srm_p_value` from Flagsmith when the API returns one. When it is nul
 - Every attempt, including refusals and aborts, appends one JSON line to `.verdict/audit.jsonl`: time, experiment, winner, the numbers the decision was based on (identities, lift, interval, chance, as-of time), the override reason if any, the approver (`git config user.name`, or the OS user), and each step with its HTTP status. Keys and email addresses are never written.
 
 Flagsmith's own audit logs and change requests are part of its paid plans. Verdict does not replace them. It gives a team on the free plan a typed approval and a local record for one specific action: rolling out an experiment winner.
-
-## Flagsmith features used
-
-| Feature | Where |
-|---|---|
-| Flagsmith CLI v2: `flagsmith api` as transport, `flagsmith eval` for verification, `flagsmith flag update` as the undo, `flagsmith auth status` | `src/flagsmith/cli-transport.ts`, `src/ship/execute.ts` |
-| Flagsmith CLI v2 from an agent: `flagsmith config --jq`, `flagsmith api --jq` to list experiments in one line each, `flagsmith eval --jq`, `flagsmith flag get --jq` | `skills/flagsmith-ship-winner` |
-| Experiments API: list, detail, exposures, results, both refresh endpoints, complete with a rollout decision | `src/flagsmith/client.ts` |
-| Metrics API (event definitions) | VD005 |
-| Warehouse connection and its received event names | VD008, preflight notes, decision row 3 |
-| Multivariate flags, variation keys and weights | VD003, VD004, VD009, ship |
-| SDK experiment calls: `getExperimentFlag`, `trackEvent`, `trackExposureEvent`, `flushEvents`, `close` | sample page and `examples/simulate.mjs` |
-| SDK API identity evaluation | verification fallback when the CLI is not installed |
 
 ## How it compares
 
